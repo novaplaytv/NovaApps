@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaPlay | App Store</title>
+    <link rel="icon" type="image/webp" href="https://raw.githubusercontent.com/novaplaytv/novaimg/main/novasplash.webp">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e50914;
+            --primary-hover: #ff000d;
+            --bg: #050505;
+            --card-bg: #111111;
+            --text: #ffffff;
+            --text-muted: #888888;
+            --border: rgba(255,255,255,0.05);
+            --nav-height: 70px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        .glow {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, rgba(229, 9, 20, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Navigation */
+        nav {
+            height: var(--nav-height);
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-inner {
+            max-width: 1200px;
+            margin: auto;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 900;
+            font-size: 20px;
+            letter-spacing: -0.5px;
+        }
+        .brand img { width: 32px; border-radius: 6px; }
+
+        /* Main */
+        main {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        header h1 {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 900;
+            margin-bottom: 15px;
+            letter-spacing: -1.5px;
+        }
+        header p {
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        /* Grid */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .app-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        .app-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(229, 9, 20, 0.05), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
+        }
+        .app-card:hover::before { transform: translateX(100%); }
+
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            background: #000;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+        .app-icon.stable { color: #4caf50; }
+        .app-icon.beta { color: #ff9800; }
+        .app-icon.killer { color: var(--primary); }
+        .app-icon.codecs { color: #2196f3; }
+
+        .app-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .app-tag {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: var(--text-muted);
+            width: fit-content;
+            margin-bottom: 20px;
+        }
+
+        .info-list {
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .info-item span:first-child { color: var(--text-muted); font-weight: 500; }
+        .info-item span:last-child { color: #fff; font-weight: 700; }
+
+        .btn-dl {
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            padding: 18px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .btn-dl:hover {
+            background: var(--primary);
+            color: #fff;
+            transform: scale(1.02);
+        }
+        .btn-dl i { font-size: 18px; }
+
+        footer {
+            margin-top: 100px;
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: #444;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .app-grid { grid-template-columns: 1fr; }
+            main { margin: 40px auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="glow"></div>
+
+<nav>
+    <div class="nav-inner">
+        <a href="/" class="brand">
+            <img src="https://raw.githubusercontent.com/novaplaytv/novaimg/main/novasplash.webp" alt="NovaPlay">
+            NOVAPLAY APPS
+        </a>
+    </div>
+</nav>
+
+<main>
+    <header>
+        <h1>Centro de Descargas</h1>
+        <p>Accede a las últimas versiones oficiales de nuestro ecosistema.</p>
+    </header>
+
+    <div class="app-grid">
+        <!-- NovaPlay Stable -->
+        <div class="app-card">
+            <div class="app-icon stable"><i class="fas fa-play"></i></div>
+            <div class="app-tag">Versión Estable</div>
+            <h2 class="app-title">NovaPlay</h2>
+            <div class="info-list">
+                <div class="info-item"><span>Versión</span> <span id="stable-v">...</span></div>
+                <div class="info-item"><span>Actualizado</span> <span id="stable-date">...</span></div>
+                <div class="info-item"><span>Tamaño</span> <span id="stable-size">...</span></div>
+            </div>
+            <a href="https://mrghnngupolsgatcmevw.supabase.co/storage/v1/object/public/novaplayestable/novaplay.apk" class="btn-dl">
+                <i class="fas fa-download"></i> DESCARGAR APK
+            </a>
+        </div>
+
+        <!-- NovaPlay Beta -->
+        <div class="app-card">
+            <div class="app-icon beta"><i class="fas fa-flask"></i></div>
+            <div class="app-tag">Acceso Anticipado</div>
+            <h2 class="app-title">NovaPlay Beta</h2>
+            <div class="info-list">
+                <div class="info-item"><span>Versión</span> <span id="beta-v">...</span></div>
+                <div class="info-item"><span>Actualizado</span> <span id="beta-date">...</span></div>
+                <div class="info-item"><span>Tamaño</span> <span id="beta-size">...</span></div>
+            </div>
+            <a href="https://mrghnngupolsgatcmevw.supabase.co/storage/v1/object/public/novaplaybeta/novaplaybeta.apk" class="btn-dl">
+                <i class="fas fa-download"></i> DESCARGAR BETA
+            </a>
+        </div>
+
+        <!-- KillerTV -->
+        <div class="app-card">
+            <div class="app-icon killer"><i class="fas fa-tv"></i></div>
+            <div class="app-tag">Optimizado para TV</div>
+            <h2 class="app-title">KillerTV</h2>
+            <div class="info-list">
+                <div class="info-item"><span>Versión</span> <span id="killer-v">...</span></div>
+                <div class="info-item"><span>Actualizado</span> <span id="killer-date">...</span></div>
+                <div class="info-item"><span>Tamaño</span> <span id="killer-size">...</span></div>
+            </div>
+            <a href="https://raw.githubusercontent.com/novaplaytv/OtherProyects/main/killertv/killertv.apk" class="btn-dl">
+                <i class="fas fa-download"></i> DESCARGAR APK
+            </a>
+        </div>
+
+        <!-- NovaCodecs -->
+        <div class="app-card">
+            <div class="app-icon codecs"><i class="fas fa-cube"></i></div>
+            <div class="app-tag">Complemento</div>
+            <h2 class="app-title">NovaCodecs</h2>
+            <div class="info-list">
+                <div class="info-item"><span>Versión</span> <span id="codecs-v">1.5</span></div>
+                <div class="info-item"><span>Actualizado</span> <span id="codecs-date">...</span></div>
+                <div class="info-item"><span>Tamaño</span> <span id="codecs-size">...</span></div>
+            </div>
+            <a href="https://github.com/novaplaytv/updater/raw/main/novacodecs.apk" class="btn-dl">
+                <i class="fas fa-download"></i> DESCARGAR CODECS
+            </a>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>© 2026 NovaPlay TV - Desarrollado por MSGT</p>
+    <p>Todos los derechos reservados</p>
+</footer>
+
+<script>
+    async function fetchMetadata() {
+        const apps = [
+            { id: 'stable', repo: 'novaplaytv/updater', path: 'novaplay.apk', json: 'https://raw.githubusercontent.com/novaplaytv/updater/main/updatestable.json' },
+            { id: 'beta', repo: 'novaplaytv/updater', path: 'novaplaybeta.apk', json: 'https://raw.githubusercontent.com/novaplaytv/updater/main/updatebeta.json' },
+            { id: 'killer', repo: 'novaplaytv/OtherProyects', path: 'killertv/killertv.apk', json: 'https://raw.githubusercontent.com/novaplaytv/OtherProyects/main/killertv/updates.json' },
+            { id: 'codecs', repo: 'novaplaytv/updater', path: 'novacodecs.apk' }
+        ];
+
+        for (const app of apps) {
+            try {
+                // Fetch GitHub File Data
+                const res = await fetch(`https://api.github.com/repos/${app.repo}/contents/${app.path}`);
+                const data = await res.json();
+
+                // Fetch commit data for date
+                const commitRes = await fetch(`https://api.github.com/repos/${app.repo}/commits?path=${app.path}&per_page=1`);
+                const commitData = await commitRes.json();
+
+                if (commitData[0]) {
+                    const date = new Date(commitData[0].commit.committer.date);
+                    document.getElementById(`${app.id}-date`).innerText = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+                }
+
+                if (data.size) {
+                    const sizeMb = (data.size / (1024 * 1024)).toFixed(1);
+                    document.getElementById(`${app.id}-size`).innerText = `${sizeMb} MB`;
+                }
+
+                // Fetch Version from JSON if exists
+                if (app.json) {
+                    const jsonRes = await fetch(app.json);
+                    const jsonData = await jsonRes.json();
+                    document.getElementById(`${app.id}-v`).innerText = jsonData.version || jsonData.versionName || '...';
+                }
+
+            } catch (e) {
+                console.error(`Error loading ${app.id}:`, e);
+            }
+        }
+    }
+
+    fetchMetadata();
+</script>
+
+</body>
+</html>
