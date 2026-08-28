@@ -224,6 +224,7 @@
     <header>
         <h1>Centro de Descargas</h1>
         <p>Accede a las últimas versiones oficiales de nuestro ecosistema.</p>
+        <p id="last-sync" style="font-size: 10px; margin-top: 10px; opacity: 0.5;"></p>
     </header>
 
     <div class="app-grid">
@@ -294,8 +295,10 @@
 <script>
     async function fetchMetadata() {
         try {
-            // Leemos el archivo que el bot actualiza cada hora
-            const res = await fetch('app_data.json');
+            // FASE REPARACIÓN: Forzar descarga fresca (Cache Busting)
+            const res = await fetch('app_data.json?t=' + new Date().getTime());
+            if (!res.ok) throw new Error("Archivo de datos no encontrado");
+
             const data = await res.json();
 
             const updateUI = (id, info) => {
@@ -311,8 +314,11 @@
             updateUI('stable', data.stable);
             updateUI('beta', data.beta);
             updateUI('killer', data.killer);
+
+            document.getElementById('last-sync').innerText = "Sincronizado: " + new Date().toLocaleTimeString();
         } catch (e) {
             console.error("Error cargando datos de aplicaciones:", e);
+            document.getElementById('last-sync').innerText = "Usando datos locales. Refresque en unos minutos.";
         }
     }
 
