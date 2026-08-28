@@ -2,8 +2,8 @@ name: Update App Data
 
 on:
   schedule:
-    - cron: '0 * * * *' # Se ejecuta cada hora
-  workflow_dispatch:      # Permite ejecución manual
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,41 +19,45 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
-          # Script para obtener info de cada APK usando el API de GitHub con Token
-          
           get_info() {
             local repo=$1
             local path=$2
             local json_url=$3
             
-            # Obtener Tamaño y Fecha usando el Token
-            local file_data=$(curl -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$repo/contents/$path")
-            local size_bytes=$(echo $file_data | jq -r '.size')
+            # Obtener Tamaño y Fecha usando el API de GitHub con Token
+            local file_data=$(curl -sH "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$repo/contents/$path")
+            local size_bytes=$(echo "$file_data" | jq -r '.size // 0')
             local size_mb=$(echo "scale=1; $size_bytes / 1048576" | bc)
             
-            local commit_data=$(curl -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$repo/commits?path=$path&per_page=1")
-            local date_raw=$(echo $commit_data | jq -r '.[0].commit.committer.date')
+            local commit_data=$(curl -sH "Authorization: token $GH_TOKEN" "https://api.github.com/repos/$repo/commits?path=$path&per_page=1")
+            local date_raw=$(echo "$commit_data" | jq -r '.[0].commit.committer.date // ""')
             
-            # Obtener Versión del JSON
+            # Obtener Versión del JSON (usando el Token para repos privados)
             local version="..."
             if [ ! -z "$json_url" ]; then
-              version=$(curl -sL $json_url | jq -r '.version // .versionName')
+              # Extraer repo y path de la URL raw para usar el API y el Token
+              # Ejemplo: https://raw.githubusercontent.com/user/repo/main/file.json
+              local j_user=$(echo "$json_url" | cut -d'/' -f4)
+              local j_repo=$(echo "$json_url" | cut -d'/' -f5)
+              local j_path=$(echo "$j_url" | cut -d'/' -f7-)
+              
+              # Intentar obtener versión. Si falla, intentar curl directo.
+              version=$(curl -sH "Authorization: token $GH_TOKEN" "$json_url" | jq -r '.version // .versionName // "..."')
             fi
             
             echo "{\"version\": \"$version\", \"size\": \"$size_mb MB\", \"date\": \"$date_raw\"}"
           }
 
-          # Recolectar de todos los proyectos
           STABLE=$(get_info "novaplaytv/updater" "novaplay.apk" "https://raw.githubusercontent.com/novaplaytv/updater/main/updatestable.json")
           BETA=$(get_info "novaplaytv/updater" "novaplaybeta.apk" "https://raw.githubusercontent.com/novaplaytv/updater/main/updatebeta.json")
           KILLER=$(get_info "novaplaytv/OtherProyects" "killertv/killertv.apk" "https://raw.githubusercontent.com/novaplaytv/OtherProyects/main/killertv/updates.json")
 
-          # Guardar en un archivo JSON local
-          echo "{\"stable\":$STABLE, \"beta\":$BETA, \"killer\":$KILLER, \"codecs\":$CODECS}" > app_data.json
+          # Generar JSON válido sin codecs
+          echo "{\"stable\":$STABLE, \"beta\":$BETA, \"killer\":$KILLER}" > app_data.json
 
       - name: Commit and Push
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "NovaStats Bot"
+          git config --local user.name "NovaApps Bot"
           git add app_data.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update: Sincronización de versiones y tamaños" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update: Sincronización automática de metadatos" && git push)
