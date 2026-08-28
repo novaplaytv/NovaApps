@@ -296,43 +296,28 @@
 
 <script>
     async function fetchMetadata() {
-        const apps = [
-            { id: 'stable', repo: 'novaplaytv/updater', path: 'novaplay.apk', json: 'https://raw.githubusercontent.com/novaplaytv/updater/main/updatestable.json' },
-            { id: 'beta', repo: 'novaplaytv/updater', path: 'novaplaybeta.apk', json: 'https://raw.githubusercontent.com/novaplaytv/updater/main/updatebeta.json' },
-            { id: 'killer', repo: 'novaplaytv/OtherProyects', path: 'killertv/killertv.apk', json: 'https://raw.githubusercontent.com/novaplaytv/OtherProyects/main/killertv/updates.json' },
-            { id: 'codecs', repo: 'novaplaytv/updater', path: 'novacodecs.apk' }
-        ];
+        try {
+            // Leemos el archivo que el bot actualiza cada hora
+            const res = await fetch('app_data.json');
+            const data = await res.json();
 
-        for (const app of apps) {
-            try {
-                // Fetch GitHub File Data
-                const res = await fetch(`https://api.github.com/repos/${app.repo}/contents/${app.path}`);
-                const data = await res.json();
+            const updateUI = (id, info) => {
+                if (!info) return;
+                const date = new Date(info.date);
+                document.getElementById(`${id}-v`).innerText = info.version || '...';
+                document.getElementById(`${id}-size`).innerText = info.size || '...';
+                document.getElementById(`${id}-date`).innerText = date.toLocaleDateString('es-ES', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+            };
 
-                // Fetch commit data for date
-                const commitRes = await fetch(`https://api.github.com/repos/${app.repo}/commits?path=${app.path}&per_page=1`);
-                const commitData = await commitRes.json();
+            updateUI('stable', data.stable);
+            updateUI('beta', data.beta);
+            updateUI('killer', data.killer);
+            updateUI('codecs', data.codecs);
 
-                if (commitData[0]) {
-                    const date = new Date(commitData[0].commit.committer.date);
-                    document.getElementById(`${app.id}-date`).innerText = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-                }
-
-                if (data.size) {
-                    const sizeMb = (data.size / (1024 * 1024)).toFixed(1);
-                    document.getElementById(`${app.id}-size`).innerText = `${sizeMb} MB`;
-                }
-
-                // Fetch Version from JSON if exists
-                if (app.json) {
-                    const jsonRes = await fetch(app.json);
-                    const jsonData = await jsonRes.json();
-                    document.getElementById(`${app.id}-v`).innerText = jsonData.version || jsonData.versionName || '...';
-                }
-
-            } catch (e) {
-                console.error(`Error loading ${app.id}:`, e);
-            }
+        } catch (e) {
+            console.error("Error cargando datos de aplicaciones:", e);
         }
     }
 
