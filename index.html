@@ -272,19 +272,6 @@
             </a>
         </div>
 
-        <!-- NovaCodecs -->
-        <div class="app-card">
-            <div class="app-icon codecs"><i class="fas fa-cube"></i></div>
-            <div class="app-tag">Complemento</div>
-            <h2 class="app-title">NovaCodecs</h2>
-            <div class="info-list">
-                <div class="info-item"><span>Versión</span> <span id="codecs-v">1.5</span></div>
-                <div class="info-item"><span>Actualizado</span> <span id="codecs-date">...</span></div>
-                <div class="info-item"><span>Tamaño</span> <span id="codecs-size">...</span></div>
-            </div>
-            <a href="https://github.com/novaplaytv/updater/raw/main/novacodecs.apk" class="btn-dl">
-                <i class="fas fa-download"></i> DESCARGAR CODECS
-            </a>
         </div>
     </div>
 </main>
@@ -314,8 +301,6 @@
             updateUI('stable', data.stable);
             updateUI('beta', data.beta);
             updateUI('killer', data.killer);
-            updateUI('codecs', data.codecs);
-
         } catch (e) {
             console.error("Error cargando datos de aplicaciones:", e);
         }
