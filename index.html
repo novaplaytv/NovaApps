@@ -41,36 +41,16 @@
             z-index: -1;
         }
 
-        /* Navigation */
-        nav {
-            height: var(--nav-height);
-            border-bottom: 1px solid var(--border);
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(20px);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .nav-inner {
-            max-width: 1200px;
-            margin: auto;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-        }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: #fff;
-            font-weight: 900;
-            font-size: 20px;
-            letter-spacing: -0.5px;
-        }
-        .brand img { width: 32px; border-radius: 6px; }
+        /* Navegación Premium */
+        .nova-nav { position: fixed; top: 0; width: 100%; z-index: 10000; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .nav-inner { max-width: 1400px; margin: auto; height: 70px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; font-weight: 900; font-size: 22px; letter-spacing: -1px; z-index: 10001; }
+        .nav-brand img { width: 36px; height: 32px; border-radius: 8px; }
+
+        .nav-links { display: flex; gap: 15px; align-items: center; }
+        .nav-links a { color: #ccc; text-decoration: none; font-size: 14px; font-weight: 600; transition: 0.2s; padding: 10px 15px; border-radius: 10px; }
+        .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-links a.active { color: var(--primary); }
 
         /* Main */
         main {
@@ -211,14 +191,14 @@
 
 <div class="glow"></div>
 
-<nav>
+<nav class="nova-nav">
     <div class="nav-inner">
-        <a href="/" class="brand">
-            <img src="https://raw.githubusercontent.com/novaplaytv/novaimg/main/novasplash.webp" alt="NovaPlay">
-            NovaPlay
+        <a class="nav-brand" href="https://novaplaytv.github.io/">
+            <img src="https://raw.githubusercontent.com/novaplaytv/novaimg/main/novasplash.webp" alt="Logo">
+            NOVAPLAY
         </a>
         <div class="nav-links" id="navLinks">
-            <a href="https://novaplaytv.github.io/">INICIO</a>
+            <a href="https://novaplaytv.github.io/" id="nav-home">INICIO</a>
             <button class="btn btn-primary" id="navLogout" style="display:none;" onclick="cerrarSesion()">SALIR</button>
         </div>
     </div>
