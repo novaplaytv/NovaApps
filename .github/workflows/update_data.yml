@@ -3,6 +3,8 @@ name: Update App Data
 on:
   schedule:
     - cron: '0 * * * *'
+  repository_dispatch:
+    types: [on-app-update]
   workflow_dispatch:
 
 permissions:
