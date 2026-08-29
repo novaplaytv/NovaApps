@@ -172,14 +172,8 @@
         }
         .btn-dl i { font-size: 18px; }
 
-        footer {
-            margin-top: 100px;
-            padding: 40px 20px;
-            text-align: center;
-            border-top: 1px solid var(--border);
-            color: #444;
-            font-size: 13px;
-        }
+        footer { padding: 60px 20px; background: #000; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .footer-text { font-size: 13px; color: #444; line-height: 1.8; font-weight: 600; }
 
         @media (max-width: 600px) {
             .app-grid { grid-template-columns: 1fr; }
@@ -272,8 +266,10 @@
 </main>
 
 <footer>
-    <p>© 2026 NovaPlay TV - Desarrollado por MSGT</p>
-    <p>Todos los derechos reservados</p>
+    <div class="footer-text">
+        © 2026 NOVAPLAY TV<br>
+        © 2010 - 2026 - MSGT. TODOS LOS DERECHOS RESERVADOS
+    </div>
 </footer>
 
 <script>
