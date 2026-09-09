@@ -196,7 +196,6 @@
         </a>
         <div class="nav-links" id="navLinks">
             <a href="https://novaplaytv.github.io/" class="active" id="nav-home" style="color: var(--primary); font-weight: 800;">INICIO</a>
-            <button class="btn btn-primary" id="navLogout" style="display:none;" onclick="cerrarSesion()">SALIR</button>
         </div>
     </div>
 </nav>
@@ -253,13 +252,11 @@
                 PROXIMAMENTE - VERSION LIBRE Y GRATUITA
             </p>
             <div class="info-list">
-                <div class="info-item"><span>Estado</span> <span>PROXIMAMENTE</span></div>
+                <div class="info-item"><span>Estado</span> <span>PRÓXIMAMENTE</span></div>
             </div>
             <button class="btn-dl" disabled style="opacity: 0.5; cursor: not-allowed; background: #333; color: #888;">
                 <i class="fas fa-clock"></i> PRÓXIMAMENTE
             </button>
-        </div>
-
         </div>
     </div>
 </main>
@@ -272,36 +269,60 @@
 </footer>
 
 <script>
-    async function fetchMetadata() {
+    const CONNECTOR_URL = "https://mrghnngupolsgatcmevw.supabase.co/functions/v1/access_connector";
+    const APP_USER = "novaplay";
+
+    async function fetchSafeData(action, isBeta = false) {
         try {
-            // FASE REPARACIÓN: Forzar descarga fresca (Cache Busting)
-            const res = await fetch('app_data.json?t=' + new Date().getTime());
-            if (!res.ok) throw new Error("Archivo de datos no encontrado");
+            // Handshake para obtener credenciales
+            const authRes = await fetch(CONNECTOR_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "obtener_credenciales", usuario: APP_USER })
+            });
+            const credentials = await authRes.json();
+            const authHeader = "Basic " + btoa(`${APP_USER}:${credentials.password}`);
 
-            const data = await res.json();
-
-            const updateUI = (id, info) => {
-                if (!info) return;
-                const date = new Date(info.date);
-                document.getElementById(`${id}-v`).innerText = info.version || '...';
-                document.getElementById(`${id}-size`).innerText = info.size || '...';
-                document.getElementById(`${id}-date`).innerText = date.toLocaleDateString('es-ES', {
-                    day: '2-digit', month: 'short', year: 'numeric'
-                });
-            };
-
-            updateUI('stable', data.stable);
-            updateUI('beta', data.beta);
-            updateUI('killer', data.killer);
-
-            document.getElementById('last-sync').innerText = "Sincronizado: " + new Date().toLocaleTimeString();
+            // Obtener datos reales
+            const dataRes = await fetch(CONNECTOR_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': authHeader
+                },
+                body: JSON.stringify({ action: action, beta: isBeta })
+            });
+            return await dataRes.json();
         } catch (e) {
-            console.error("Error cargando datos de aplicaciones:", e);
-            document.getElementById('last-sync').innerText = "Usando datos locales. Refresque en unos minutos.";
+            console.error("Error cargando metadatos:", e);
+            return null;
         }
     }
 
-    fetchMetadata();
+    async function init() {
+        const [stable, beta] = await Promise.all([
+            fetchSafeData("obtener_actualizacion", false),
+            fetchSafeData("obtener_actualizacion", true)
+        ]);
+
+        const updateUI = (id, data) => {
+            if (!data) return;
+            document.getElementById(`${id}-v`).innerText = data.version || '...';
+            document.getElementById(`${id}-size`).innerText = data.size || '...';
+            if (data.date) {
+                const date = new Date(data.date);
+                document.getElementById(`${id}-date`).innerText = date.toLocaleDateString('es-ES', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+            }
+        };
+
+        updateUI('stable', stable);
+        updateUI('beta', beta);
+        document.getElementById('last-sync').innerText = "Sincronizado: " + new Date().toLocaleTimeString();
+    }
+
+    init();
 </script>
 
 </body>
